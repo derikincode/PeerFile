@@ -407,7 +407,7 @@ function Lobby({ onSend, onReceive }) {
         </div>
 
         {/* Features strip */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: ".65rem", marginTop: "1rem" }}>
+        <div className="feat-strip-mobile" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: ".65rem", marginTop: "1rem" }}>
           {features.map(([Icon, tx]) => (
             <div key={tx} style={{ background: "var(--s1)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)", padding: ".75rem .85rem", display: "flex", alignItems: "center", gap: ".5rem" }}>
               {typeof Icon === "string"
@@ -427,7 +427,7 @@ function Lobby({ onSend, onReceive }) {
             <div style={{ height: 1, flex: 1, background: "var(--border2)" }} />
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+          <div className="tutorial-grid-mobile" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
             {[
               { color: "var(--accent)", bg: "rgba(0,255,234,.1)", border: "rgba(0,255,234,.2)", Icon: Upload, title: "Enviando", steps: [["1","Clique em Enviar arquivos","Código comprimido é gerado (~400 chars)"],["2","Copie e envie","WhatsApp, email, qualquer canal"],["3","Cole a resposta","O receptor gera e te envia"],["4","Envie os arquivos","P2P direto, sem servidor"]] },
               { color: "#a78bfa", bg: "rgba(157,78,255,.1)", border: "rgba(157,78,255,.25)", Icon: Download, title: "Recebendo", steps: [["1","Clique em Receber arquivos","Tela de conexão abre"],["2","Cole o código","O que o remetente te enviou"],["3","Copie sua resposta","Envie de volta para ele"],["4","Aguarde e baixe","Arquivos chegam automaticamente"]] },
@@ -452,7 +452,7 @@ function Lobby({ onSend, onReceive }) {
             ))}
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: ".75rem" }}>
+          <div className="tips-grid-mobile" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: ".75rem" }}>
             {tips.map(([Icon, t, d]) => (
               <div key={t} style={{ background: "var(--s2)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)", padding: "1rem 1.1rem", display: "flex", gap: ".75rem" }}>
                 <Icon size={18} style={{ flexShrink: 0, marginTop: 2, color: "var(--accent)" }} />

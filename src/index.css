@@ -328,7 +328,7 @@ body::before{
 ══════════════════════════════════════════ */
 @media(max-width:820px){
   .room-layout{grid-template-columns:1fr}
-  .side-col{order:2} /* sidebar vai pra baixo */
+  .side-col{order:2}
   .mini-stats{grid-template-columns:repeat(3,1fr)}
 }
 
@@ -336,16 +336,15 @@ body::before{
    RESPONSIVE — MOBILE (≤600px)
 ══════════════════════════════════════════ */
 @media(max-width:600px){
-  /* App shell */
   .app{padding:.85rem .85rem 4rem}
 
-  /* Header compacto */
+  /* Header */
   .header{flex-wrap:wrap;min-height:auto;gap:.5rem;padding-bottom:.75rem;margin-bottom:.85rem}
   .header-right{gap:.35rem}
   .logo-text{font-size:1rem}
   .logo-ico{width:32px;height:32px}
 
-  /* Steps menores */
+  /* Steps */
   .steps{padding:0;margin-bottom:1rem}
   .step-num{width:26px;height:26px;font-size:.65rem}
   .step-label{font-size:.48rem;letter-spacing:.04em}
@@ -359,7 +358,16 @@ body::before{
   .lobby{padding:1rem .85rem}
   .lobby-cards-grid{grid-template-columns:1fr}
 
-  /* Tabs scroll horizontal */
+  /* Features strip — 2 colunas em mobile */
+  .feat-strip-mobile{grid-template-columns:1fr 1fr}
+
+  /* Tutorial — coluna única */
+  .tutorial-grid-mobile{grid-template-columns:1fr}
+
+  /* Tips cards — 2 colunas */
+  .tips-grid-mobile{grid-template-columns:1fr 1fr}
+
+  /* Tabs */
   .tabs{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;gap:2px;padding:3px}
   .tab-btn{flex-shrink:0;min-width:64px;font-size:.72rem;padding:.55rem .4rem;gap:.25rem}
 
@@ -383,7 +391,6 @@ body::before{
 
   /* Drop zone */
   .drop{padding:1.75rem 1rem}
-  .drop-ico{font-size:2rem}
   .drop-title{font-size:.88rem}
 
   /* Chat */
@@ -401,7 +408,7 @@ body::before{
   .me-row{padding:.6rem .75rem}
   .mem-name{font-size:.85rem}
 
-  /* Steps progress bar */
+  /* Progress */
   .send-progress{padding:.8rem .9rem}
   .overall-bar{height:4px}
 }
@@ -411,9 +418,9 @@ body::before{
 ══════════════════════════════════════════ */
 @media(max-width:380px){
   .app{padding:.75rem .65rem 3.5rem}
-  .step-label{display:none} /* esconde labels em telas muito pequenas */
+  .step-label{display:none}
   .tab-btn{min-width:52px;font-size:.65rem}
-  .mini-stats{grid-template-columns:1fr 1fr}
+  .tips-grid-mobile{grid-template-columns:1fr}
   .logo-text{font-size:.95rem}
   .btn{font-size:.78rem;padding:.65rem 1rem}
 }
@@ -422,6 +429,11 @@ body::before{
 .card-collapsed{padding-bottom:1rem}
 
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* ── Lobby grids ── */
+.feat-strip-mobile{grid-template-columns:repeat(5,1fr)}
+.tutorial-grid-mobile{grid-template-columns:1fr 1fr}
+.tips-grid-mobile{grid-template-columns:repeat(4,1fr)}
 
 /* ── SDP grid — hide QR on small screens ── */
 @media(max-width:520px){
