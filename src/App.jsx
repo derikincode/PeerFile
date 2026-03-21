@@ -831,16 +831,16 @@ function SenderScreen({ myName, onBack, addToast }) {
             </button>
             {!pin && step >= 2 && (
               <button className="btn btn-s btn-sm" onClick={() => setShowPin(true)} style={{ display: "flex", alignItems: "center", gap: ".3rem" }}>
-                <Lock size={13} /> PIN
+                <Lock size={13} /><span className="btn-label"> PIN</span>
               </button>
             )}
             {pin && (
               <span style={{ fontFamily: "var(--mono)", fontSize: ".7rem", color: "var(--amber)", background: "rgba(255,184,0,.1)", border: "1px solid rgba(255,184,0,.2)", padding: ".3rem .7rem", borderRadius: 6, display: "flex", alignItems: "center", gap: ".3rem" }}>
-                <Lock size={12} /> PIN ativo
+                <Lock size={12} /><span className="btn-label"> PIN</span>
               </span>
             )}
             <button className="btn btn-d btn-sm" onClick={() => { if (pcRef.current) pcRef.current.close(); document.title = "PeerFile"; onBack(); }} style={{ display: "flex", alignItems: "center", gap: ".3rem" }}>
-              <RotateCcw size={13} /> Voltar
+              <RotateCcw size={13} /><span className="btn-label"> Voltar</span>
             </button>
           </div>
         </header>
@@ -861,7 +861,7 @@ function SenderScreen({ myName, onBack, addToast }) {
             {step >= 2 && !connected && (
               <div className="card">
                 {/* Etapa 1 e 2 unificadas num card compacto */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "1rem", alignItems: "start" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "1rem", alignItems: "start" }} className="sdp-grid">
                   <div style={{ flex: 1, minWidth: 0 }}>
                     {/* Etapa 1 */}
                     <div style={{ marginBottom: ".85rem" }}>

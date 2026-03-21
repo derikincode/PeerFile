@@ -323,30 +323,110 @@ body::before{
 /* ── Header min height ── */
 .header{min-height:58px}
 
-/* ── Tabs scrollable on mobile ── */
-@media(max-width:700px){
-  .tabs{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
-  .tab-btn{flex-shrink:0;min-width:70px}
-}
-
-/* ── Sidebar mobile ── */
+/* ══════════════════════════════════════════
+   RESPONSIVE — TABLET (≤820px)
+══════════════════════════════════════════ */
 @media(max-width:820px){
-  .side-col{order:0}
+  .room-layout{grid-template-columns:1fr}
+  .side-col{order:2} /* sidebar vai pra baixo */
+  .mini-stats{grid-template-columns:repeat(3,1fr)}
 }
 
+/* ══════════════════════════════════════════
+   RESPONSIVE — MOBILE (≤600px)
+══════════════════════════════════════════ */
 @media(max-width:600px){
-  .app{padding:1.25rem 1rem 5rem}
-  .mini-stats{grid-template-columns:1fr 1fr}
+  /* App shell */
+  .app{padding:.85rem .85rem 4rem}
+
+  /* Header compacto */
+  .header{flex-wrap:wrap;min-height:auto;gap:.5rem;padding-bottom:.75rem;margin-bottom:.85rem}
+  .header-right{gap:.35rem}
+  .logo-text{font-size:1rem}
+  .logo-ico{width:32px;height:32px}
+
+  /* Steps menores */
+  .steps{padding:0;margin-bottom:1rem}
+  .step-num{width:26px;height:26px;font-size:.65rem}
+  .step-label{font-size:.48rem;letter-spacing:.04em}
+  .step-line{top:13px;left:calc(50% + 13px);right:calc(-50% + 13px)}
+
+  /* Cards */
+  .card{padding:.9rem 1rem;border-radius:12px}
+  .card-hdr{margin-bottom:.65rem}
+
+  /* Lobby */
+  .lobby{padding:1rem .85rem}
   .lobby-cards-grid{grid-template-columns:1fr}
-  .steps{padding:0}
-  .step-num{width:28px;height:28px;font-size:.7rem}
-  .step-label{font-size:.5rem}
-  .step-line{top:14px;left:calc(50% + 14px);right:calc(-50% + 14px)}
-  .header{flex-wrap:wrap;min-height:auto;gap:.5rem}
-  .room-layout{grid-template-columns:1fr}
+
+  /* Tabs scroll horizontal */
+  .tabs{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;gap:2px;padding:3px}
+  .tab-btn{flex-shrink:0;min-width:64px;font-size:.72rem;padding:.55rem .4rem;gap:.25rem}
+
+  /* Stats */
+  .mini-stats{grid-template-columns:1fr 1fr;gap:.5rem}
+  .mini-val{font-size:1rem}
+
+  /* File list */
+  .file-list-scroll{max-height:300px}
+  .file-nm{font-size:.8rem}
+  .file-meta{font-size:.58rem;gap:.3rem}
+  .file-thumb{width:34px;height:34px}
+
+  /* Recv card */
+  .recv-card{padding:.7rem .8rem;gap:.65rem}
+
+  /* Botões */
+  .btn{padding:.72rem 1.2rem;font-size:.82rem}
+  .btn-sm{padding:.42rem .75rem;font-size:.74rem}
+  .btn-full{width:100%}
+
+  /* Drop zone */
+  .drop{padding:1.75rem 1rem}
+  .drop-ico{font-size:2rem}
+  .drop-title{font-size:.88rem}
+
+  /* Chat */
+  .chat-msgs{max-height:220px}
+  .chat-bubble{font-size:.8rem;padding:.5rem .75rem}
+
+  /* Toast */
+  .toast-wrap{bottom:1rem;right:.75rem;left:.75rem}
+  .toast{max-width:100%;font-size:.7rem}
+
+  /* Room layout */
+  .room-layout{grid-template-columns:1fr;gap:.75rem}
+
+  /* Member row */
+  .me-row{padding:.6rem .75rem}
+  .mem-name{font-size:.85rem}
+
+  /* Steps progress bar */
+  .send-progress{padding:.8rem .9rem}
+  .overall-bar{height:4px}
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE — SMALL MOBILE (≤380px)
+══════════════════════════════════════════ */
+@media(max-width:380px){
+  .app{padding:.75rem .65rem 3.5rem}
+  .step-label{display:none} /* esconde labels em telas muito pequenas */
+  .tab-btn{min-width:52px;font-size:.65rem}
+  .mini-stats{grid-template-columns:1fr 1fr}
+  .logo-text{font-size:.95rem}
+  .btn{font-size:.78rem;padding:.65rem 1rem}
 }
 
 /* ── Card collapsed (step done) ── */
 .card-collapsed{padding-bottom:1rem}
 
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* ── SDP grid — hide QR on small screens ── */
+@media(max-width:520px){
+  .sdp-grid{grid-template-columns:1fr !important}
+  .sdp-grid > div:last-child{display:none} /* esconde QR Code */
+  .btn-label{display:none} /* só ícone nos botões do header */
+  .header-right .btn-sm{padding:.45rem .6rem}
+}
