@@ -110,7 +110,14 @@ const playNotif = () => {
 /* ─────────────────────────────────────────────────────────────────────
    HELPERS
 ───────────────────────────────────────────────────────────────────── */
-const randomName = () => `Peer${String(Math.floor(10000 + Math.random() * 90000))}`;
+const ADJECTIVES = ["swift","dark","bold","wild","calm","iron","neon","void","frost","storm","solar","lunar","azure","jade","crimson"];
+const NOUNS = ["falcon","cipher","vector","phantom","nexus","pulse","orbit","signal","vortex","byte","node","flux","prism","spark","ghost"];
+const randomName = () => {
+  const adj = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
+  const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)];
+  const num = Math.floor(10 + Math.random() * 90);
+  return `${adj}-${noun}-${num}`;
+};
 
 const IC = ({ icon: Icon, size = 15, style = {}, className = "" }) => (
   <Icon size={size} style={{ flexShrink: 0, ...style }} className={className} />
@@ -298,11 +305,37 @@ function PinModal({ onConfirm, onCancel, mode }) {
 
 function QRCodeWidget({ value, size = 160 }) {
   const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-  const appUrl = `${window.location.origin}${window.location.pathname}?code=${encodeURIComponent(value)}`;
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(appUrl)}&bgcolor=0d0f1a&color=00ffea&margin=8`;
-  const [loaded, setLoaded] = useState(false);
+  const [shortUrl, setShortUrl] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
   const [error, setError] = useState(false);
+
+  // Shorten URL when value changes
+  useEffect(() => {
+    if (!value || isLocalhost) return;
+    const longUrl = `${window.location.origin}${window.location.pathname}?code=${encodeURIComponent(value)}`;
+    setLoading(true);
+    setShortUrl(null);
+    setImgLoaded(false);
+    setError(false);
+
+    // Use TinyURL API to shorten
+    fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`)
+      .then(r => r.text())
+      .then(url => {
+        if (url.startsWith("http")) setShortUrl(url.trim());
+        else setError(true);
+      })
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
+  }, [value]);
+
   if (!value) return null;
+
+  const qrUrl = shortUrl
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(shortUrl)}&bgcolor=0d0f1a&color=00ffea&margin=8&qzone=1`
+    : null;
+
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: ".4rem", flexShrink: 0 }}>
       <div style={{ width: size, height: size, borderRadius: "var(--r-sm)", overflow: "hidden", background: "var(--s2)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -311,16 +344,25 @@ function QRCodeWidget({ value, size = 160 }) {
             <QrCode size={28} style={{ color: "var(--amber)" }} />
             <div style={{ fontFamily: "var(--mono)", fontSize: ".58rem", color: "var(--amber)", lineHeight: 1.5 }}>QR ativo<br />em produção</div>
           </div>
-        ) : (
+        ) : loading ? (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: ".5rem" }}>
+            <Loader size={18} style={{ color: "var(--muted)", animation: "spin 1s linear infinite" }} />
+            <div style={{ fontFamily: "var(--mono)", fontSize: ".55rem", color: "var(--muted)" }}>gerando QR...</div>
+          </div>
+        ) : error ? (
+          <div style={{ fontFamily: "var(--mono)", fontSize: ".58rem", color: "var(--muted)", textAlign: "center", padding: ".75rem" }}>QR indisponível</div>
+        ) : qrUrl ? (
           <>
-            {!loaded && !error && <Loader size={20} style={{ color: "var(--muted)", animation: "spin 1s linear infinite" }} />}
-            {!error && <img src={qrUrl} alt="QR" width={size} height={size} onLoad={() => setLoaded(true)} onError={() => setError(true)} style={{ display: loaded ? "block" : "none" }} />}
-            {error && <div style={{ fontFamily: "var(--mono)", fontSize: ".6rem", color: "var(--muted)", textAlign: "center", padding: ".75rem" }}>QR indisponível</div>}
+            {!imgLoaded && <Loader size={18} style={{ color: "var(--muted)", animation: "spin 1s linear infinite" }} />}
+            <img src={qrUrl} alt="QR" width={size} height={size}
+              onLoad={() => setImgLoaded(true)}
+              onError={() => setError(true)}
+              style={{ display: imgLoaded ? "block" : "none" }} />
           </>
-        )}
+        ) : null}
       </div>
       <div style={{ fontFamily: "var(--mono)", fontSize: ".58rem", color: isLocalhost ? "var(--amber)" : "var(--muted)", textAlign: "center" }}>
-        {isLocalhost ? "Publique para ativar" : "Escaneie com celular"}
+        {isLocalhost ? "Publique para ativar" : shortUrl ? "Escaneie com celular" : ""}
       </div>
     </div>
   );
