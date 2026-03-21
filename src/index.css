@@ -323,6 +323,11 @@ body::before{
 /* ── Header min height ── */
 .header{min-height:58px}
 
+/* ── Lobby grids (desktop defaults) ── */
+.feat-strip-mobile{grid-template-columns:repeat(5,1fr)}
+.tutorial-grid-mobile{grid-template-columns:1fr 1fr}
+.tips-grid-mobile{grid-template-columns:repeat(4,1fr)}
+
 /* ══════════════════════════════════════════
    RESPONSIVE — TABLET (≤820px)
 ══════════════════════════════════════════ */
@@ -430,10 +435,6 @@ body::before{
 
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 
-/* ── Lobby grids ── */
-.feat-strip-mobile{grid-template-columns:repeat(5,1fr)}
-.tutorial-grid-mobile{grid-template-columns:1fr 1fr}
-.tips-grid-mobile{grid-template-columns:repeat(4,1fr)}
 
 /* ── SDP grid — hide QR on small screens ── */
 @media(max-width:520px){
