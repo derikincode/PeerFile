@@ -340,7 +340,7 @@ body::before{
 /* ══════════════════════════════════════════
    RESPONSIVE — MOBILE (≤600px)
 ══════════════════════════════════════════ */
-@media(max-width:600px){
+@media(max-width:768px){
   .app{padding:.85rem .85rem 4rem}
 
   /* Header */
@@ -421,7 +421,7 @@ body::before{
 /* ══════════════════════════════════════════
    RESPONSIVE — SMALL MOBILE (≤380px)
 ══════════════════════════════════════════ */
-@media(max-width:380px){
+@media(max-width:420px){
   .app{padding:.75rem .65rem 3.5rem}
   .step-label{display:none}
   .tab-btn{min-width:52px;font-size:.65rem}
@@ -437,7 +437,7 @@ body::before{
 
 
 /* ── SDP grid — hide QR on small screens ── */
-@media(max-width:520px){
+@media(max-width:600px){
   .sdp-grid{grid-template-columns:1fr !important}
   .sdp-grid > div:last-child{display:none} /* esconde QR Code */
   .btn-label{display:none} /* só ícone nos botões do header */
