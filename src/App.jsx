@@ -2,7 +2,9 @@ import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import {
   AlertTriangle, AlignLeft, ArrowDown, ArrowUp, Bell, BellOff,
   Check, CheckCircle2, ChevronRight, Circle, CloudUpload, Copy,
-  Download, FileArchive, FolderOpen, History, Hourglass,
+  Download, FileArchive, FileAudio, FileCode, FileImage,
+  FileSpreadsheet, FileText, FileVideo, File,
+  FolderOpen, History, Hourglass,
   Inbox, KeyRound, Link, Loader, Lock, MessageCircleMore,
   Pen, Plug, QrCode, Send, ShieldCheck, Upload, User,
   X, Zap, RotateCcw, RotateCw, Wifi,
@@ -20,6 +22,31 @@ import {
 const CHUNK = 16384;
 
 const randomName = () => `Peer${Math.floor(10000 + Math.random() * 90000)}`;
+
+/* ─────────────────────────────────────────────────────────────────────
+   FILE TYPE ICON
+───────────────────────────────────────────────────────────────────── */
+function FileTypeIcon({ name = "", size = 22, isText = false }) {
+  if (isText) return <Pen size={size} style={{ color: "var(--purple)" }} />;
+  const ext = name.split(".").pop().toLowerCase();
+  const images  = ["jpg","jpeg","png","gif","webp","svg","bmp","ico"];
+  const videos  = ["mp4","mov","avi","mkv","webm","flv"];
+  const audios  = ["mp3","wav","flac","ogg","aac","m4a"];
+  const zips    = ["zip","rar","7z","tar","gz","bz2"];
+  const docs    = ["pdf","doc","docx","txt","md","rtf","odt"];
+  const sheets  = ["xls","xlsx","csv"];
+  const slides  = ["ppt","pptx"];
+  const codes   = ["js","ts","jsx","tsx","py","go","html","css","json","xml","yaml","yml","sh","sql"];
+
+  if (images.includes(ext))  return <FileImage  size={size} style={{ color: "#00ffea" }} />;
+  if (videos.includes(ext))  return <FileVideo  size={size} style={{ color: "#f472b6" }} />;
+  if (audios.includes(ext))  return <FileAudio  size={size} style={{ color: "#a78bfa" }} />;
+  if (zips.includes(ext))    return <FileArchive size={size} style={{ color: "#ffb800" }} />;
+  if (docs.includes(ext))    return <FileText   size={size} style={{ color: "#60a5fa" }} />;
+  if (sheets.includes(ext))  return <FileSpreadsheet size={size} style={{ color: "#4ade80" }} />;
+  if (codes.includes(ext))   return <FileCode   size={size} style={{ color: "#fb923c" }} />;
+  return <File size={size} style={{ color: "var(--muted)" }} />;
+}
 
 /* ─────────────────────────────────────────────────────────────────────
    HOOKS
@@ -109,24 +136,36 @@ function ChatBox({ messages, chatText, setChatText, onSend, typingPeer }) {
 function TransferHistory({ history }) {
   if (!history.length) return <div className="empty">Nenhuma transferência ainda</div>;
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: ".55rem" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: ".5rem" }}>
       {history.map((h, i) => (
-        <div key={i} style={{ display: "flex", alignItems: "center", gap: ".85rem", padding: ".75rem .9rem", background: "var(--s2)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)" }}>
-          <div className="file-thumb">{fileIcon(h.name)}</div>
+        <div key={i} style={{ display: "flex", alignItems: "center", gap: ".9rem", padding: ".8rem 1rem", background: "var(--s2)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)", transition: "border-color .2s" }}
+          onMouseEnter={e => e.currentTarget.style.borderColor = "var(--border2)"}
+          onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
+          {/* Ícone do tipo de arquivo */}
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: "var(--s1)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <FileTypeIcon name={h.name} size={20} isText={h.isText} />
+          </div>
+          {/* Info */}
           <div className="file-inf">
-            <div className="file-nm">{h.name}</div>
-            <div className="file-meta">
-              <span style={{ color: h.direction === "sent" ? "var(--accent)" : "var(--green)", display: "flex", alignItems: "center", gap: ".2rem" }}>
+            <div className="file-nm" title={h.name}>{h.name}</div>
+            <div className="file-meta" style={{ marginTop: ".2rem" }}>
+              <span style={{ color: h.direction === "sent" ? "var(--accent)" : "var(--green)", display: "flex", alignItems: "center", gap: ".2rem", fontWeight: 600 }}>
                 {h.direction === "sent" ? <ArrowUp size={10} /> : <ArrowDown size={10} />}
                 {h.direction === "sent" ? "enviado" : "recebido"}
               </span>
               <span>{fmt(h.size)}</span>
               <span>{h.ts}</span>
-              {h.checksumOk === true  && <span className="badge badge-green"><Check size={9} style={{ marginRight: 2 }} />íntegro</span>}
-              {h.checksumOk === false && <span className="badge badge-err"><X size={9} style={{ marginRight: 2 }} />corrompido</span>}
+              {h.checksumOk === true  && <span className="badge badge-green" style={{ display: "flex", alignItems: "center", gap: 2 }}><Check size={9} />íntegro</span>}
+              {h.checksumOk === false && <span className="badge badge-err"   style={{ display: "flex", alignItems: "center", gap: 2 }}><X size={9} />corrompido</span>}
             </div>
           </div>
-          {h.url && <a className="btn btn-p btn-sm" href={h.url} download={h.name} style={{ display: "flex", alignItems: "center", gap: ".3rem" }}><Download size={13} />Baixar</a>}
+          {/* Baixar */}
+          {h.url && (
+            <a className="btn btn-p btn-sm" href={h.url} download={h.name}
+              style={{ display: "flex", alignItems: "center", gap: ".3rem", flexShrink: 0 }}>
+              <Download size={13} /> Baixar
+            </a>
+          )}
         </div>
       ))}
     </div>
@@ -374,9 +413,15 @@ function Session({ myName, role, targetId, onBack, addToast }) {
   const [previews, setPreviews]   = useState({});
   const [downloadedFiles, setDownloadedFiles] = useState(new Set());
   const [copied, setCopied]       = useState(false);
+  const [reconnecting, setReconnecting] = useState(false);
+  const [reconnectCount, setReconnectCount] = useState(0);
 
-  const peerRef  = useRef(null);
-  const connRef  = useRef(null);
+  const peerRef       = useRef(null);
+  const connRef       = useRef(null);
+  const reconnectTimer = useRef(null);
+  const visibilityTimer = useRef(null);
+  const myIdRef       = useRef("");
+  const targetIdRef   = useRef(targetId);
   const sentRef  = useRef(0);
   const startRef = useRef(null);
   const spTimer  = useRef(null);
@@ -388,37 +433,121 @@ function Session({ myName, role, targetId, onBack, addToast }) {
 
   const totalSize = useMemo(() => files.reduce((s, f) => s + f.size, 0), [files]);
 
-  /* ── PeerJS init ── */
-  useEffect(() => {
-    let peer;
-    import("peerjs").then(({ Peer }) => {
-      peer = new Peer({ debug: 0 });
-      peerRef.current = peer;
+  /* ── PeerJS init + reconnect ── */
+  const initPeer = (PeerClass, keepId = null) => {
+    const peer = keepId ? new PeerClass(keepId, { debug: 0 }) : new PeerClass({ debug: 0 });
+    peerRef.current = peer;
 
-      peer.on("open", (id) => {
-        setMyId(id);
-        setStatus("ready");
-        if (!isSender && targetId) {
-          const conn = peer.connect(targetId, { reliable: true, serialization: "binary" });
-          connRef.current = conn;
-          setupConn(conn);
-        }
-      });
-
-      peer.on("connection", (conn) => {
+    peer.on("open", (id) => {
+      myIdRef.current = id;
+      setMyId(id);
+      setStatus("ready");
+      setReconnecting(false);
+      setReconnectCount(0);
+      // Receiver auto-connects
+      if (!isSender && targetIdRef.current) {
+        const conn = peer.connect(targetIdRef.current, { reliable: true, serialization: "binary" });
         connRef.current = conn;
         setupConn(conn);
-      });
+        // Timeout 15s — show error if not connected
+        setTimeout(() => {
+          if (!conn.open) {
+            setStatus("error");
+            addToast("Não foi possível conectar. Verifique o ID.", "err");
+          }
+        }, 15000);
+      }
+    });
 
-      peer.on("error", (err) => {
-        if (err.type === "peer-unavailable") addToast("ID não encontrado. Verifique e tente novamente.", "err");
-        else addToast("Erro: " + err.type, "err");
+    peer.on("connection", (conn) => {
+      connRef.current = conn;
+      setupConn(conn);
+    });
+
+    peer.on("error", (err) => {
+      if (err.type === "peer-unavailable") {
+        addToast("ID não encontrado ou expirado.", "err");
         setStatus("error");
+        setReconnecting(false);
+        clearTimeout(reconnectTimer.current); // stop any pending reconnect
+      } else if (err.type === "unavailable-id") {
+        // ID already taken, get a new one
+        addToast("ID em uso, gerando novo...", "warn");
+        if (peerRef.current && !peerRef.current.destroyed) peerRef.current.destroy();
+        import("peerjs").then(({ Peer }) => initPeer(Peer, null));
+      } else if (err.type !== "disconnected") {
+        addToast("Erro: " + err.type, "err");
+        setStatus("error");
+        setReconnecting(false);
+      }
+    });
+
+    peer.on("disconnected", () => {
+      // PeerJS server disconnected (not P2P) — try to reconnect to signaling server
+      setTimeout(() => {
+        if (peerRef.current && !peerRef.current.destroyed) {
+          peerRef.current.reconnect();
+        }
+      }, 2000);
+    });
+  };
+
+  const doReconnect = () => {
+    setReconnecting(true);
+    setConnected(false);
+    setStatus("connecting");
+    clearTimeout(reconnectTimer.current);
+    // Destroy old peer and create new one keeping same ID
+    const oldId = myIdRef.current;
+    if (peerRef.current && !peerRef.current.destroyed) {
+      peerRef.current.destroy();
+    }
+    reconnectTimer.current = setTimeout(() => {
+      import("peerjs").then(({ Peer }) => {
+        initPeer(Peer, oldId || null);
       });
-    }).catch(() => addToast("Erro ao carregar PeerJS", "err"));
+    }, 1000);
+  };
+
+  useEffect(() => {
+    import("peerjs").then(({ Peer }) => initPeer(Peer));
+
+    // Visibility API — detect when user comes back from another app
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") {
+        clearTimeout(visibilityTimer.current);
+        visibilityTimer.current = setTimeout(() => {
+          const peer = peerRef.current;
+          if (!peer || peer.destroyed) { doReconnect(); return; }
+          // Check if still connected to signaling server
+          if (peer.disconnected) { peer.reconnect(); }
+          // Check P2P connection
+          const conn = connRef.current;
+          if (conn && conn.peerConnection) {
+            const state = conn.peerConnection.connectionState;
+            if (state === "failed" || state === "disconnected" || state === "closed") {
+              doReconnect();
+            }
+          }
+        }, 1500);
+      }
+    };
+
+    // Network online event
+    const handleOnline = () => {
+      addToast("Conexão restaurada — reconectando...", "info");
+      doReconnect();
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+    window.addEventListener("online", handleOnline);
 
     return () => {
       clearInterval(spTimer.current);
+      clearTimeout(reconnectTimer.current);
+      clearTimeout(visibilityTimer.current);
+      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("online", handleOnline);
       if (peerRef.current) peerRef.current.destroy();
       document.title = "PeerFile";
     };
@@ -428,17 +557,34 @@ function Session({ myName, role, targetId, onBack, addToast }) {
     conn.on("open", () => {
       setConnected(true);
       setStatus("connected");
+      setReconnecting(false);
       addToast("Conectado!", "ok");
       document.title = "Conectado — PeerFile";
     });
     conn.on("data", handleData);
     conn.on("close", () => {
+      const wasConnected = connected;
+      setConnected(false);
+      document.title = "PeerFile";
+      if (wasConnected) {
+        // Was connected — real disconnection, try to reconnect
+        setStatus("error");
+        addToast("Conexão encerrada", "warn");
+        if (!isSender) {
+          reconnectTimer.current = setTimeout(() => doReconnect(), 3000);
+        } else {
+          setStatus("ready"); // Sender waits for receiver to reconnect
+        }
+      } else {
+        // Never connected — just show error, don't retry
+        setStatus("error");
+      }
+    });
+    conn.on("error", () => {
       setConnected(false);
       setStatus("error");
-      addToast("Conexão encerrada", "warn");
-      document.title = "PeerFile";
+      addToast("Erro na conexão", "err");
     });
-    conn.on("error", () => { addToast("Erro na conexão", "err"); setStatus("error"); });
   };
 
   /* ── Receive data ── */
@@ -464,7 +610,9 @@ function Session({ myName, role, targetId, onBack, addToast }) {
       setUnreadChat(u => u + 1); return;
     }
     if (msg.type === "text") {
-      setTextReceived(t => [...t, { text: msg.text, ts: tsNow() }]);
+      const t = tsNow();
+      setTextReceived(tr => [...tr, { text: msg.text, ts: t }]);
+      setHistory(h => [...h, { name: msg.text.slice(0, 40) + (msg.text.length > 40 ? "..." : ""), size: msg.text.length, direction: "received", ts: t, isText: true }]);
       addToast("Texto recebido!", "ok");
       if (soundRef.current) playNotif(); return;
     }
@@ -507,7 +655,6 @@ function Session({ myName, role, targetId, onBack, addToast }) {
       if (info.checksum) {
         try { checksumOk = crc32(await finalBlob.arrayBuffer()) === info.checksum; } catch {}
       }
-      if (isImage(info.name)) setImagePreview(url);
       setHistory(h => [...h, { name: info.name, size: info.origSize || finalBlob.size, url, checksumOk, direction: "received", ts: tsNow() }]);
       addToast(`${info.name} recebido!`, "ok");
       setUnreadRecv(u => u + 1);
@@ -584,8 +731,11 @@ function Session({ myName, role, targetId, onBack, addToast }) {
 
   const sendText = () => {
     if (!textToSend.trim() || !connRef.current) return;
-    connRef.current.send(JSON.stringify({ type: "text", text: textToSend }));
-    addToast("Texto enviado!", "ok"); setTextToSend("");
+    const text = textToSend.trim();
+    connRef.current.send(JSON.stringify({ type: "text", text }));
+    setHistory(h => [...h, { name: text.slice(0, 40) + (text.length > 40 ? "..." : ""), size: text.length, direction: "sent", ts: tsNow(), isText: true }]);
+    addToast("Texto enviado!", "ok");
+    setTextToSend("");
   };
 
   const switchTab = (t) => {
@@ -674,15 +824,31 @@ function Session({ myName, role, targetId, onBack, addToast }) {
               </div>
             )}
 
+            {/* Reconnecting */}
+            {reconnecting && (
+              <div style={{ background: "rgba(255,184,0,.08)", border: "1px solid rgba(255,184,0,.25)", borderRadius: "var(--r-sm)", padding: "1rem 1.1rem", display: "flex", gap: ".75rem", alignItems: "center" }}>
+                <Loader size={18} style={{ color: "var(--amber)", flexShrink: 0, animation: "spin 1s linear infinite" }} />
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: ".88rem", color: "var(--amber)", marginBottom: ".2rem" }}>Reconectando...</div>
+                  <div style={{ fontFamily: "var(--mono)", fontSize: ".68rem", color: "var(--muted)" }}>Aguarde — tentando restabelecer a conexão.</div>
+                </div>
+              </div>
+            )}
+
             {/* Error state */}
-            {status === "error" && (
+            {status === "error" && !reconnecting && (
               <div style={{ background: "rgba(255,45,85,.08)", border: "1px solid rgba(255,45,85,.25)", borderRadius: "var(--r-sm)", padding: "1rem 1.1rem", display: "flex", gap: ".75rem", alignItems: "center" }}>
                 <X size={18} style={{ color: "var(--red)", flexShrink: 0 }} />
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: ".88rem", color: "var(--red)", marginBottom: ".2rem" }}>Falha na conexão</div>
-                  <div style={{ fontFamily: "var(--mono)", fontSize: ".68rem", color: "var(--muted)" }}>Verifique se o ID está correto e tente novamente.</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, fontSize: ".88rem", color: "var(--red)", marginBottom: ".2rem" }}>Conexão perdida</div>
+                  <div style={{ fontFamily: "var(--mono)", fontSize: ".68rem", color: "var(--muted)" }}>A conexão foi interrompida.</div>
                 </div>
-                <button className="btn btn-s btn-sm" style={{ marginLeft: "auto", flexShrink: 0 }} onClick={onBack}>Voltar</button>
+                <div style={{ display: "flex", flexDirection: "column", gap: ".4rem", flexShrink: 0 }}>
+                  <button className="btn btn-p btn-sm" style={{ display: "flex", alignItems: "center", gap: ".3rem" }} onClick={doReconnect}>
+                    <RotateCw size={13} /> Reconectar
+                  </button>
+                  <button className="btn btn-s btn-sm" onClick={onBack}>Voltar</button>
+                </div>
               </div>
             )}
 
@@ -728,7 +894,7 @@ function Session({ myName, role, targetId, onBack, addToast }) {
                             <div key={i} className="file-card">
                               <div className="file-row">
                                 <div className="file-thumb" onClick={() => previews[i] && setImagePreview(previews[i])} style={{ cursor: previews[i] ? "pointer" : "default" }}>
-                                  {previews[i] ? <img src={previews[i]} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 8 }} /> : fileIcon(f.name)}
+                                  {previews[i] ? <img src={previews[i]} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 8 }} /> : <FileTypeIcon name={f.name} size={20} />}
                                 </div>
                                 <div className="file-inf">
                                   <div className="file-nm" title={f.name}>{f.name}</div>
@@ -840,7 +1006,7 @@ function Session({ myName, role, targetId, onBack, addToast }) {
                         <div className="file-list-scroll"><div className="file-list">
                           {history.filter(h => h.direction === "received" && h.url).map((f, i) => (
                             <div key={i} className="recv-card" onClick={() => f.url && isImage(f.name) && setImagePreview(f.url)} style={{ cursor: isImage(f.name) ? "pointer" : "default" }}>
-                              <div className="file-thumb">{f.url && isImage(f.name) ? <img src={f.url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 9 }} /> : fileIcon(f.name)}</div>
+                              <div className="file-thumb">{f.url && isImage(f.name) ? <img src={f.url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 9 }} /> : <FileTypeIcon name={f.name} size={20} />}</div>
                               <div className="file-inf">
                                 <div className="file-nm">{f.name}</div>
                                 <div className="recv-from">

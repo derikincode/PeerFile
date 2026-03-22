@@ -22,27 +22,12 @@ export const fmtDate = (ts) =>
   new Date(ts).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
 export const tsNow = () =>
-  new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  new Date().toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
 // ── File helpers ────────────────────────────────────────────────────
-export const fileIcon = (name = "") => {
-  const ext = name.split(".").pop().toLowerCase();
-  const m = {
-    pdf: "📄", doc: "📝", docx: "📝", txt: "📃", md: "📃", rtf: "📝",
-    jpg: "🖼️", jpeg: "🖼️", png: "🖼️", gif: "🖼️", webp: "🖼️", svg: "🖼️", bmp: "🖼️", ico: "🖼️",
-    mp4: "🎬", mov: "🎬", avi: "🎬", mkv: "🎬", webm: "🎬", flv: "🎬",
-    mp3: "🎵", wav: "🎵", flac: "🎵", ogg: "🎵", aac: "🎵", m4a: "🎵",
-    zip: "📦", rar: "📦", "7z": "📦", tar: "📦", gz: "📦", bz2: "📦",
-    js: "⚙️", ts: "⚙️", jsx: "⚙️", tsx: "⚙️", py: "🐍", go: "🐹",
-    html: "🌐", css: "🎨", json: "📋", xml: "📋", yaml: "📋", yml: "📋",
-    xls: "📊", xlsx: "📊", csv: "📊",
-    ppt: "📑", pptx: "📑",
-    exe: "💾", dmg: "💾", pkg: "💾", deb: "💾", apk: "📱", ipa: "📱",
-    sh: "🖥️", bat: "🖥️", ps1: "🖥️",
-    sql: "🗄️", db: "🗄️", sqlite: "🗄️",
-  };
-  return m[ext] || "📎";
-};
+// fileIcon is now handled by FileTypeIcon component in App.jsx (Lucide icons)
+// This function kept for legacy compatibility — returns null
+export const fileIcon = (_name = "") => null;
 
 export const isImage = (name = "") => /\.(jpe?g|png|gif|webp|svg|bmp)$/i.test(name);
 export const isVideo = (name = "") => /\.(mp4|mov|avi|mkv|webm)$/i.test(name);
