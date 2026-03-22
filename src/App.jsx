@@ -4,7 +4,7 @@ import {
   Check, CheckCircle2, ChevronRight, Circle, CloudUpload, Copy,
   Download, FileArchive, FolderOpen, History, Hourglass,
   Inbox, KeyRound, Link, Loader, Lock, MessageCircleMore,
-  Pen, Plug, Send, ShieldCheck, Upload, User,
+  Pen, Plug, QrCode, Send, ShieldCheck, Upload, User,
   X, Zap, RotateCcw, RotateCw, Wifi,
 } from "lucide-react";
 import {
@@ -162,11 +162,13 @@ function Lobby({ onSend, onReceive }) {
 
         {/* Hero */}
         <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
-          <div style={{ width: 68, height: 68, background: "var(--accent)", borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 40px rgba(0,255,234,.4)", margin: "0 auto 1.25rem" }}>
-            <Zap size={34} style={{ color: "#000" }} />
-          </div>
-          <div style={{ fontSize: "2.4rem", fontWeight: 800, letterSpacing: "-.05em", lineHeight: 1, marginBottom: ".5rem" }}>
-            Peer<span style={{ color: "var(--accent)" }}>File</span>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: ".75rem", marginBottom: ".6rem" }}>
+            <div style={{ width: 48, height: 48, background: "var(--accent)", borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 30px rgba(0,255,234,.4)", flexShrink: 0 }}>
+              <Zap size={26} style={{ color: "#000" }} />
+            </div>
+            <div style={{ fontSize: "2.4rem", fontWeight: 800, letterSpacing: "-.05em", lineHeight: 1 }}>
+              Peer<span style={{ color: "var(--accent)" }}>File</span>
+            </div>
           </div>
           <div style={{ fontFamily: "var(--mono)", fontSize: ".7rem", color: "var(--muted)", letterSpacing: ".1em", textTransform: "uppercase" }}>
             Compartilhe arquivos · P2P · Sem servidor
@@ -189,17 +191,17 @@ function Lobby({ onSend, onReceive }) {
           {/* Botões principais */}
           {!mode && (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: ".85rem" }}>
-              <button className="btn btn-p btn-full" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: ".4rem", padding: "1.1rem", height: "auto" }}
+              <button className="btn btn-p btn-full" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: ".3rem", padding: ".75rem", height: "auto" }}
                 onClick={() => setMode("send")}>
-                <Upload size={22} />
-                <span style={{ fontSize: ".88rem" }}>Enviar</span>
-                <span style={{ fontFamily: "var(--mono)", fontSize: ".6rem", opacity: .7, fontWeight: 400 }}>Gera um ID</span>
+                <Upload size={18} />
+                <span style={{ fontSize: ".85rem" }}>Enviar</span>
+                <span style={{ fontFamily: "var(--mono)", fontSize: ".58rem", opacity: .7, fontWeight: 400 }}>Gera um ID</span>
               </button>
-              <button className="btn btn-full" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: ".4rem", padding: "1.1rem", height: "auto", background: "var(--purple)", color: "#fff", border: "none", borderRadius: "var(--r-sm)", cursor: "pointer" }}
+              <button className="btn btn-full" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: ".3rem", padding: ".75rem", height: "auto", background: "var(--purple)", color: "#fff", border: "none", borderRadius: "var(--r-sm)", cursor: "pointer" }}
                 onClick={() => setMode("receive")}>
-                <Download size={22} />
-                <span style={{ fontSize: ".88rem" }}>Receber</span>
-                <span style={{ fontFamily: "var(--mono)", fontSize: ".6rem", opacity: .7, fontWeight: 400 }}>Cola o ID</span>
+                <Download size={18} />
+                <span style={{ fontSize: ".85rem" }}>Receber</span>
+                <span style={{ fontFamily: "var(--mono)", fontSize: ".58rem", opacity: .7, fontWeight: 400 }}>Cola o ID</span>
               </button>
             </div>
           )}
@@ -277,6 +279,61 @@ function Lobby({ onSend, onReceive }) {
           </div>
         </footer>
 
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   QR CODE WIDGET
+───────────────────────────────────────────────────────────────────── */
+function QRWidget({ peerId }) {
+  const [shortUrl, setShortUrl] = useState(null);
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState(false);
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+
+  useEffect(() => {
+    if (!peerId || isLocal) return;
+    setLoading(true); setShortUrl(null); setImgLoaded(false); setError(false);
+    const longUrl = `${window.location.origin}/?receive=${encodeURIComponent(peerId)}`;
+    fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`)
+      .then(r => r.text())
+      .then(url => { if (url.startsWith("http")) setShortUrl(url.trim()); else setError(true); })
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
+  }, [peerId]);
+
+  const size = 130;
+  const qrUrl = shortUrl
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(shortUrl)}&bgcolor=07091a&color=00ffea&margin=6&qzone=1`
+    : null;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: ".4rem", flexShrink: 0 }}>
+      <div style={{ width: size, height: size, borderRadius: "var(--r-sm)", background: "var(--s2)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+        {isLocal ? (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: ".35rem", padding: ".75rem", textAlign: "center" }}>
+            <QrCode size={24} style={{ color: "var(--amber)" }} />
+            <div style={{ fontFamily: "var(--mono)", fontSize: ".55rem", color: "var(--amber)", lineHeight: 1.4 }}>QR ativo<br/>em produção</div>
+          </div>
+        ) : loading ? (
+          <Loader size={18} style={{ color: "var(--muted)", animation: "spin 1s linear infinite" }} />
+        ) : error ? (
+          <div style={{ fontFamily: "var(--mono)", fontSize: ".58rem", color: "var(--muted)", textAlign: "center", padding: ".5rem" }}>QR indisponível</div>
+        ) : qrUrl ? (
+          <>
+            {!imgLoaded && <Loader size={18} style={{ color: "var(--muted)", animation: "spin 1s linear infinite" }} />}
+            <img src={qrUrl} alt="QR" width={size} height={size}
+              onLoad={() => setImgLoaded(true)}
+              onError={() => setError(true)}
+              style={{ display: imgLoaded ? "block" : "none" }} />
+          </>
+        ) : null}
+      </div>
+      <div style={{ fontFamily: "var(--mono)", fontSize: ".57rem", color: "var(--muted)", textAlign: "center" }}>
+        {isLocal ? "Publique para ativar" : "Receptor escaneia"}
       </div>
     </div>
   );
@@ -585,18 +642,21 @@ function Session({ myName, role, targetId, onBack, addToast }) {
                 <div className="card-hdr">
                   <div className="card-title"><Wifi size={13} style={{ marginRight: ".4rem", color: "var(--accent)" }} />Seu ID de conexão</div>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: ".75rem", flexWrap: "wrap" }}>
-                  <div style={{ flex: 1, background: "var(--s2)", border: "1px solid rgba(0,255,234,.25)", borderRadius: "var(--r-sm)", padding: ".85rem 1.1rem", fontFamily: "var(--mono)", fontSize: "1.05rem", fontWeight: 700, color: "var(--accent)", letterSpacing: ".04em", wordBreak: "break-all", minWidth: 0 }}>
-                    {myId}
+                <div style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ background: "var(--s2)", border: "1px solid rgba(0,255,234,.25)", borderRadius: "var(--r-sm)", padding: ".85rem 1.1rem", fontFamily: "var(--mono)", fontSize: "1.05rem", fontWeight: 700, color: "var(--accent)", letterSpacing: ".04em", wordBreak: "break-all", marginBottom: ".6rem" }}>
+                      {myId}
+                    </div>
+                    <button className="btn btn-p btn-full" onClick={copyId} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: ".4rem" }}>
+                      {copied ? <><Check size={14} /> Copiado!</> : <><Copy size={14} /> Copiar ID</>}
+                    </button>
+                    <div style={{ fontFamily: "var(--mono)", fontSize: ".65rem", color: "var(--muted)", marginTop: ".65rem", display: "flex", alignItems: "center", gap: ".4rem" }}>
+                      {connected
+                        ? <><CheckCircle2 size={12} style={{ color: "var(--green)" }} /> Receptor conectado!</>
+                        : <><Hourglass size={12} style={{ color: "var(--amber)" }} /> Aguardando receptor...</>}
+                    </div>
                   </div>
-                  <button className="btn btn-p" onClick={copyId} style={{ display: "flex", alignItems: "center", gap: ".4rem", flexShrink: 0 }}>
-                    {copied ? <><Check size={14} /> Copiado!</> : <><Copy size={14} /> Copiar ID</>}
-                  </button>
-                </div>
-                <div style={{ fontFamily: "var(--mono)", fontSize: ".65rem", color: "var(--muted)", marginTop: ".65rem", display: "flex", alignItems: "center", gap: ".4rem" }}>
-                  {connected
-                    ? <><CheckCircle2 size={12} style={{ color: "var(--green)" }} /> Receptor conectado — pode enviar os arquivos!</>
-                    : <><Hourglass size={12} style={{ color: "var(--amber)" }} /> Compartilhe este ID com o receptor</>}
+                  {!connected && <QRWidget peerId={myId} />}
                 </div>
               </div>
             )}
@@ -884,6 +944,16 @@ export default function App() {
   const goSend    = (name)          => { setMyName(name); localStorage.setItem("pf-name", name); setRole("send");    setScreen("session"); };
   const goReceive = (name, peerId)  => { setMyName(name); localStorage.setItem("pf-name", name); setRole("receive"); setTargetId(peerId); setScreen("session"); };
   const goBack    = ()              => setScreen("lobby");
+
+  // Auto-connect if URL has ?receive=ID
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const rid = params.get("receive");
+    if (rid) {
+      window.history.replaceState({}, "", window.location.pathname);
+      goReceive(myName, rid);
+    }
+  }, []);
 
   return (
     <>
