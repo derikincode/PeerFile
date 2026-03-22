@@ -435,10 +435,23 @@ function Session({ myName, role, targetId, onBack, addToast }) {
 
   /* ── PeerJS init + reconnect ── */
   const initPeer = (PeerClass, keepId = null) => {
-    const peer = keepId ? new PeerClass(keepId, { debug: 0 }) : new PeerClass({ debug: 0 });
+    // Only reuse ID on explicit reconnect (count > 0), not on fresh session
+    const peer = (keepId && reconnectCount > 0)
+      ? new PeerClass(keepId, { debug: 0 })
+      : new PeerClass({ debug: 0 });
     peerRef.current = peer;
 
+    // If no ID in 6s, retry fresh
+    const connectTimeout = setTimeout(() => {
+      if (peerRef.current === peer && !myIdRef.current) {
+        addToast("Demorando... tentando novamente.", "warn");
+        peer.destroy();
+        import("peerjs").then(({ Peer }) => initPeer(Peer, null));
+      }
+    }, 6000);
+
     peer.on("open", (id) => {
+      clearTimeout(connectTimeout);
       myIdRef.current = id;
       setMyId(id);
       setStatus("ready");
@@ -746,7 +759,7 @@ function Session({ myName, role, targetId, onBack, addToast }) {
 
   const copyId = () => { copyText(myId); setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
-  const statusLabel = { connecting: "Conectando...", ready: isSender ? "Aguardando receptor..." : "Conectando ao remetente...", connected: "P2P conectado", error: "Erro de conexão" }[status];
+  const statusLabel = { connecting: reconnecting ? "Reconectando..." : "Iniciando...", ready: isSender ? "Aguardando receptor..." : "Conectando ao remetente...", connected: "P2P conectado", error: "Conexão perdida" }[status];
   const statusDot   = { connecting: "warn", ready: "warn", connected: "on", error: "err" }[status];
 
   const tabs = isSender
