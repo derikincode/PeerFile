@@ -4,7 +4,7 @@ import {
   Check, CheckCircle2, ChevronRight, Circle, CloudUpload, Copy,
   Download, FileArchive, FolderOpen, History, Hourglass,
   Inbox, KeyRound, Link, Loader, Lock, MessageCircleMore,
-  Pen, Send, ShieldCheck, Upload, User,
+  Pen, Plug, Send, ShieldCheck, Upload, User,
   X, Zap, RotateCcw, RotateCw, Wifi,
 } from "lucide-react";
 import {
